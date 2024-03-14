@@ -119,6 +119,15 @@ func stepsToTrigger(files []string, watch []WatchConfig) ([]Step, error) {
 
 // matchPath checks if the file f matches the path p.
 func matchPath(p string, f string) (bool, error) {
+	// Check to see if the path starts with a `!` to then negate the match.
+	if strings.HasPrefix(p, "!") {
+		p = p[1:]
+		match, err := doublestar.Match(p, f)
+		if err != nil {
+			return false, fmt.Errorf("path matching failed: %v", err)
+		}
+		return !match, nil
+	}
 	// If the path contains a glob, the `doublestar.Match`
 	// method is used to determine the match,
 	// otherwise `strings.HasPrefix` is used.
