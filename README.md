@@ -43,7 +43,7 @@ Configuration supports 2 different step types.
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only HEAD~1"
           watch:
             - path: app/
@@ -70,7 +70,7 @@ steps:
 steps:
   - label: "Triggering pipelines with plugin"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           watch:
             - path: test/.buildkite/
               config: # Required [trigger step configuration]
@@ -137,7 +137,7 @@ git diff --name-only "$LATEST_TAG"
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only HEAD~1"
           watch:
             - path: "bar-service/"
@@ -164,7 +164,7 @@ A default `config` to run if no paths are matched, the `config` key is not reuir
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only HEAD~1"
           watch:
             - path: "bar-service/"
@@ -186,7 +186,7 @@ The object values provided in this configuration will be appended to `env` prope
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only HEAD~1"
           watch:
             - path: "foo-service/"
@@ -208,7 +208,7 @@ Add `log_level` property to set the log level. Supported log levels are `debug` 
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only HEAD~1"
           log_level: "debug" # defaults to "info"
           watch:
@@ -239,7 +239,7 @@ By setting `wait` to `true`, the build will wait until the triggered pipeline bu
 steps:
   - label: "Triggering pipelines"
     plugins:
-      - monorepo-diff#v1.0.1:
+      - monorepo-diff#v1.1.0:
           diff: "git diff --name-only $(head -n 1 last_successful_build)"
           interpolation: false
           env:
