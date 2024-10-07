@@ -231,6 +231,28 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 				{Trigger: "txt"},
 			},
 		},
+		"default configuration": {
+			ChangedFiles: []string{
+				"unmatched/file.txt",
+			},
+			WatchConfigs: []WatchConfig{
+				{
+					Paths: []string{"app/"},
+					Step:  Step{Trigger: "app-deploy"},
+				},
+				{
+					Paths: []string{"test/bin/"},
+					Step:  Step{Command: "echo Make Changes to Bin"},
+				},
+				{
+					Default: true,
+					Step:    Step{Command: "echo Default action"},
+				},
+			},
+			Expected: []Step{
+				{Command: "echo Default action"},
+			},
+		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {

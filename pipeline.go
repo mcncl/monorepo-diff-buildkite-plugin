@@ -104,8 +104,13 @@ func diff(command string) ([]string, error) {
 
 func stepsToTrigger(files []string, watch []WatchConfig) ([]Step, error) {
 	steps := []Step{}
+	var defaultStep *Step
 
 	for _, w := range watch {
+		if w.Default {
+			defaultStep = &w.Step
+			continue
+		}
 		for _, p := range w.Paths {
 			for _, f := range files {
 				match, err := matchPath(p, f)
@@ -118,6 +123,10 @@ func stepsToTrigger(files []string, watch []WatchConfig) ([]Step, error) {
 				}
 			}
 		}
+	}
+
+	if len(steps) == 0 && defaultStep != nil {
+		steps = append(steps, *defaultStep)
 	}
 
 	return dedupSteps(steps), nil

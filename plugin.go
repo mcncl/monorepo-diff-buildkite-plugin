@@ -34,6 +34,7 @@ type WatchConfig struct {
 	RawPath interface{} `json:"path"`
 	Paths   []string
 	Step    Step `json:"config"`
+	Default bool `json:"default"`
 }
 
 type Group struct {
@@ -124,12 +125,16 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 	// Path can be string or an array of strings,
 	// handle both cases and create an array of paths.
 	for i, p := range plugin.Watch {
-		switch p.RawPath.(type) {
-		case string:
-			plugin.Watch[i].Paths = []string{plugin.Watch[i].RawPath.(string)}
-		case []interface{}:
-			for _, v := range plugin.Watch[i].RawPath.([]interface{}) {
-				plugin.Watch[i].Paths = append(plugin.Watch[i].Paths, v.(string))
+		if p.Default {
+			plugin.Watch[i].Paths = []string{"*"}
+		} else if p.RawPath != nil {
+			switch p.RawPath.(type) {
+			case string:
+				plugin.Watch[i].Paths = []string{plugin.Watch[i].RawPath.(string)}
+			case []interface{}:
+				for _, v := range plugin.Watch[i].RawPath.([]interface{}) {
+					plugin.Watch[i].Paths = append(plugin.Watch[i].Paths, v.(string))
+				}
 			}
 		}
 
