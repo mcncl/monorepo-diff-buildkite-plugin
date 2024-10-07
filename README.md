@@ -154,6 +154,30 @@ This controls the pipeline interpolation on upload, and defaults to `true`.
 If set to `false` it adds `--no-interpolation` to the `buildkite pipeline upload`,
 to avoid trying to interpolate the commit message, which can cause failures.
 
+#### `default` (optional)
+
+A default `config` to run if no paths are matched, the `config` key is not reuired, so a `default` can be written with a `config` attribute or simple just a `command` or `trigger`.
+
+**Example**
+
+```yaml
+steps:
+  - label: "Triggering pipelines"
+    plugins:
+      - monorepo-diff#v1.0.1:
+          diff: "git diff --name-only HEAD~1"
+          watch:
+            - path: "bar-service/"
+              config:
+                command: "echo deploy-bar"
+            - path: "foo-service/"
+              config:
+                trigger: "deploy-foo-service"
+            - default: 
+                config: ## <-- Optional
+                  command: echo "Hello, world!"
+```
+
 #### `env` (optional)
 
 The object values provided in this configuration will be appended to `env` property of all steps or commands.
