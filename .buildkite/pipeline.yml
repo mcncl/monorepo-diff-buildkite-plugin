@@ -147,3 +147,31 @@ steps:
               config:
                 group: "this is a group"
                 command: "echo this-does-not-run"
+  - labeL: ":testtube: Testing default config"
+    plugins:
+      - artifacts#v1.9.2:
+          download:
+            - "monorepo-diff-buildkite-plugin"
+      - monorepo-diff#${BUILDKITE_COMMIT}:
+          diff: "cat ./e2e/commands-or-triggers"
+          watch:
+            - path: "not_a_path/"
+              config:
+                command: echo "This shouldn't run"
+            - default:
+                command: "echo hello-world"
+
+  - labeL: ":testtube: Testing default config with map"
+    plugins:
+      - artifacts#v1.9.2:
+          download:
+            - "monorepo-diff-buildkite-plugin"
+      - monorepo-diff#${BUILDKITE_COMMIT}:
+          diff: "cat ./e2e/commands-or-triggers"
+          watch:
+            - path: "not_a_path/"
+              config:
+                command: echo "This shouldn't run"
+            - default:
+              config:
+                command: "echo hello-world"
