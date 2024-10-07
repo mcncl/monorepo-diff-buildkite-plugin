@@ -174,5 +174,5 @@ steps:
               config:
                 command: echo "This shouldn't run"
             - default:
-              config:
-                command: "echo hello-world"
+                config:
+                  command: "echo hello-world"
