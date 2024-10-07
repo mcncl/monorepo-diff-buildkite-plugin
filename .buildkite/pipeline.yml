@@ -147,7 +147,8 @@ steps:
               config:
                 group: "this is a group"
                 command: "echo this-does-not-run"
-  - labeL: ":testtube: Testing default config"
+
+  - label: ":testtube: Testing default config"
     plugins:
       - artifacts#v1.9.2:
           download:
@@ -161,7 +162,7 @@ steps:
             - default:
                 command: "echo hello-world"
 
-  - labeL: ":testtube: Testing default config with map"
+  - label: ":testtube: Testing default config with map"
     plugins:
       - artifacts#v1.9.2:
           download:
