@@ -10,7 +10,6 @@ func setupLogger(logLevel string) {
 	})
 
 	ll, err := log.ParseLevel(logLevel)
-
 	if err != nil {
 		ll = log.InfoLevel
 	}
@@ -29,7 +28,6 @@ func main() {
 	log.Debugf("received plugin: \n%v", plugins)
 
 	plugin, err := initializePlugin(plugins)
-
 	if err != nil {
 		log.Debug(err)
 		log.Fatal(err)

@@ -1,7 +1,6 @@
 package main
 
 import (
-	"io/ioutil"
 	"os"
 	"testing"
 
@@ -121,7 +120,6 @@ func TestPipelinesToTriggerGetsListOfPipelines(t *testing.T) {
 }
 
 func TestPipelinesStepsToTrigger(t *testing.T) {
-
 	testCases := map[string]struct {
 		ChangedFiles []string
 		WatchConfigs []WatchConfig
@@ -231,6 +229,28 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 				{Trigger: "txt"},
 			},
 		},
+		"default configuration": {
+			ChangedFiles: []string{
+				"unmatched/file.txt",
+			},
+			WatchConfigs: []WatchConfig{
+				{
+					Paths: []string{"app/"},
+					Step:  Step{Trigger: "app-deploy"},
+				},
+				{
+					Paths: []string{"test/bin/"},
+					Step:  Step{Command: "echo Make Changes to Bin"},
+				},
+				{
+					Default: struct{}{},
+					Step:    Step{Command: "buildkite-agent pipeline upload other_tests.yml"},
+				},
+			},
+			Expected: []Step{
+				{Command: "buildkite-agent pipeline upload other_tests.yml"},
+			},
+		},
 	}
 	for name, tc := range testCases {
 		t.Run(name, func(t *testing.T) {
@@ -288,11 +308,10 @@ func TestGeneratePipeline(t *testing.T) {
 	require.NoError(t, err)
 	defer os.Remove(pipeline.Name())
 
-	got, err := ioutil.ReadFile(pipeline.Name())
+	got, err := os.ReadFile(pipeline.Name())
 	require.NoError(t, err)
 
-	want :=
-		`notify:
+	want := `notify:
 - email: foo@gmail.com
 - email: bar@gmail.com
 - basecamp_campfire: https://basecamp
@@ -331,8 +350,7 @@ steps:
 func TestGeneratePipelineWithNoStepsAndHooks(t *testing.T) {
 	steps := []Step{}
 
-	want :=
-		`steps:
+	want := `steps:
 - wait: null
 - command: echo "hello world"
 - command: cat ./file.txt
@@ -350,7 +368,7 @@ func TestGeneratePipelineWithNoStepsAndHooks(t *testing.T) {
 	require.NoError(t, err)
 	defer os.Remove(pipeline.Name())
 
-	got, err := ioutil.ReadFile(pipeline.Name())
+	got, err := os.ReadFile(pipeline.Name())
 	require.NoError(t, err)
 
 	assert.Equal(t, want, string(got))
@@ -359,8 +377,7 @@ func TestGeneratePipelineWithNoStepsAndHooks(t *testing.T) {
 func TestGeneratePipelineWithNoStepsAndNoHooks(t *testing.T) {
 	steps := []Step{}
 
-	want :=
-		`steps: []
+	want := `steps: []
 `
 
 	plugin := Plugin{}
@@ -369,7 +386,7 @@ func TestGeneratePipelineWithNoStepsAndNoHooks(t *testing.T) {
 	require.NoError(t, err)
 	defer os.Remove(pipeline.Name())
 
-	got, err := ioutil.ReadFile(pipeline.Name())
+	got, err := os.ReadFile(pipeline.Name())
 	require.NoError(t, err)
 
 	assert.Equal(t, want, string(got))
