@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 	"reflect"
 	"strings"
@@ -94,7 +93,6 @@ func diff(command string) ([]string, error) {
 		env("SHELL", "bash"),
 		[]string{"-c", strings.Replace(command, "\n", " ", -1)},
 	)
-
 	if err != nil {
 		return nil, fmt.Errorf("diff command failed: %v", err)
 	}
@@ -107,7 +105,7 @@ func stepsToTrigger(files []string, watch []WatchConfig) ([]Step, error) {
 	var defaultStep *Step
 
 	for _, w := range watch {
-		if w.Default {
+		if w.Default != nil {
 			defaultStep = &w.Step
 			continue
 		}
@@ -172,7 +170,7 @@ func dedupSteps(steps []Step) []Step {
 }
 
 func generatePipeline(steps []Step, plugin Plugin) (*os.File, bool, error) {
-	tmp, err := ioutil.TempFile(os.TempDir(), "bmrd-")
+	tmp, err := os.CreateTemp(os.TempDir(), "bmrd-")
 	if err != nil {
 		return nil, false, fmt.Errorf("could not create temporary pipeline file: %v", err)
 	}
@@ -214,7 +212,7 @@ func generatePipeline(steps []Step, plugin Plugin) (*os.File, bool, error) {
 		fmt.Printf("Generated Pipeline:\n%s\n", string(data))
 	}
 
-	if err = ioutil.WriteFile(tmp.Name(), data, 0644); err != nil {
+	if err = os.WriteFile(tmp.Name(), data, 0o644); err != nil {
 		return nil, false, fmt.Errorf("could not write step to temporary file: %v", err)
 	}
 

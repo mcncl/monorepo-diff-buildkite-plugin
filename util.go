@@ -43,9 +43,9 @@ func isString(val interface{}) (string, bool) {
 		return "", false
 	}
 
-	switch val.(type) {
+	switch val := val.(type) {
 	case string:
-		return val.(string), true
+		return val, true
 	}
 
 	return "", false

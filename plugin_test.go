@@ -138,6 +138,11 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 						],
 						"soft_fail": true
 					}
+				},
+				{
+					"default": {
+                        "command": "buildkite-agent pipeline upload other_tests.yml"
+                    }
 				}
 			]
 		}
@@ -242,6 +247,15 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 						"hi":   "bye",
 					},
 					SoftFail: true,
+				},
+			},
+			{
+				Default: map[string]interface{}{
+					"command": "buildkite-agent pipeline upload other_tests.yml",
+				},
+				Paths: []string{},
+				Step: Step{
+					Command: "buildkite-agent pipeline upload other_tests.yml",
 				},
 			},
 		},

@@ -33,8 +33,8 @@ type HookConfig struct {
 type WatchConfig struct {
 	RawPath interface{} `json:"path"`
 	Paths   []string
-	Step    Step `json:"config"`
-	Default bool `json:"default"`
+	Step    Step        `json:"config"`
+	Default interface{} `json:"default"`
 }
 
 type Group struct {
@@ -125,8 +125,16 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 	// Path can be string or an array of strings,
 	// handle both cases and create an array of paths.
 	for i, p := range plugin.Watch {
-		if p.Default {
-			plugin.Watch[i].Paths = []string{"*"}
+		if p.Default != nil {
+			plugin.Watch[i].Paths = []string{}
+			if config, ok := p.Default.(map[string]interface{}); ok && len(config) > 0 {
+				// Use the default config directly
+				b, _ := json.Marshal(config)
+				err := json.Unmarshal(b, &plugin.Watch[i].Step)
+				if err != nil {
+					return err
+				}
+			}
 		} else if p.RawPath != nil {
 			switch p.RawPath.(type) {
 			case string:
@@ -313,7 +321,7 @@ func parseEnv(raw interface{}) (map[string]string, error) {
 		return nil, nil
 	}
 
-	if _, ok := raw.([]interface{}); ok != true {
+	if _, ok := raw.([]interface{}); !ok {
 		return nil, errors.New("failed to parse plugin configuration")
 	}
 
