@@ -15,6 +15,14 @@ steps:
       plugin-linter#v3.2.0:
         id: monorepo-diff
 
+  - label: ":golang: Test"
+    command: go test ./...
+    plugins:
+      - docker#v5.9.0:
+          image: "golang"
+          always-pull: true
+          workdir: /plugin
+  
   - label: ":linux: Build"
     command: make local
     artifact_paths: monorepo-diff-buildkite-plugin

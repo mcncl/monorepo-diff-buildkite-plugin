@@ -2,8 +2,10 @@ package main
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
+	"github.com/buildkite/bintest"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
@@ -17,20 +19,52 @@ func mockGeneratePipeline(steps []Step, plugin Plugin) (*os.File, bool, error) {
 
 func TestUploadPipelineCallsBuildkiteAgentCommand(t *testing.T) {
 	plugin := Plugin{Diff: "echo ./foo-service", Interpolation: true}
+
+	agent, err := bintest.NewMock("buildkite-agent")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	oldPath := os.Getenv("PATH")
+	t.Cleanup(func() { os.Setenv("PATH", oldPath) })
+	os.Setenv("PATH", filepath.Dir(agent.Path)+":"+oldPath)
+
+	agent.
+		Expect("pipeline", "upload", "pipeline.txt").
+		AndExitWith(0)
+
 	cmd, args, err := uploadPipeline(plugin, mockGeneratePipeline)
 
 	assert.Equal(t, "buildkite-agent", cmd)
 	assert.Equal(t, []string{"pipeline", "upload", "pipeline.txt"}, args)
-	assert.Equal(t, err.Error(), "command `buildkite-agent` failed: exec: \"buildkite-agent\": executable file not found in $PATH")
+	assert.NoError(t, err)
+
+	agent.CheckAndClose(t)
 }
 
 func TestUploadPipelineCallsBuildkiteAgentCommandWithInterpolation(t *testing.T) {
 	plugin := Plugin{Diff: "echo ./foo-service", Interpolation: false}
+
+	agent, err := bintest.NewMock("buildkite-agent")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	oldPath := os.Getenv("PATH")
+	t.Cleanup(func() { os.Setenv("PATH", oldPath) })
+	os.Setenv("PATH", filepath.Dir(agent.Path)+":"+oldPath)
+
+	agent.
+		Expect("pipeline", "upload", "pipeline.txt", "--no-interpolation").
+		AndExitWith(0)
+
 	cmd, args, err := uploadPipeline(plugin, mockGeneratePipeline)
 
 	assert.Equal(t, "buildkite-agent", cmd)
 	assert.Equal(t, []string{"pipeline", "upload", "pipeline.txt", "--no-interpolation"}, args)
-	assert.Equal(t, err.Error(), "command `buildkite-agent` failed: exec: \"buildkite-agent\": executable file not found in $PATH")
+	assert.NoError(t, err)
+
+	agent.CheckAndClose(t)
 }
 
 func TestUploadPipelineCancelsIfThereIsNoDiffOutput(t *testing.T) {
@@ -39,7 +73,7 @@ func TestUploadPipelineCancelsIfThereIsNoDiffOutput(t *testing.T) {
 
 	assert.Equal(t, "", cmd)
 	assert.Equal(t, []string{}, args)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 }
 
 func TestUploadPipelineWithEmptyGeneratedPipeline(t *testing.T) {
@@ -48,7 +82,7 @@ func TestUploadPipelineWithEmptyGeneratedPipeline(t *testing.T) {
 
 	assert.Equal(t, "", cmd)
 	assert.Equal(t, []string{}, args)
-	assert.Equal(t, err, nil)
+	assert.Equal(t, nil, err)
 }
 
 func TestDiff(t *testing.T) {

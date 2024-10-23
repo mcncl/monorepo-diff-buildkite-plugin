@@ -1,8 +1,12 @@
 github.com/bmatcuk/doublestar/v2 v2.0.4 h1:6I6oUiT/sU27eE2OFcWqBhL1SwjyvQuOssxT4a1yidI=
 github.com/bmatcuk/doublestar/v2 v2.0.4/go.mod h1:QMmcs3H2AUQICWhfzLXz+IYln8lRQmTZRptLie8RgRw=
+github.com/buildkite/bintest v2.0.0+incompatible h1:efzz74HE4FsRPTWmynF9a51PdOP4BPCyTvb0QogSMUM=
+github.com/buildkite/bintest v2.0.0+incompatible/go.mod h1:2lGcuzwtlesvPHkylqPgQ0ytL6C5E6gjbb8o5ph583Y=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c=
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
+github.com/lox/bintest v2.0.0+incompatible h1:tG24Y/co/JHWvy7wnPfkYp1Y1K5+bUex3PDMwJ7t3Ew=
+github.com/lox/bintest v2.0.0+incompatible/go.mod h1:mNlHbHtMU6Ang9ocdTOs3ZBJ12GsDaOdSKvGJL5gy2A=
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/sirupsen/logrus v1.8.1 h1:dJKuHgqk1NNQlqoA6BTlM1Wf9DOH3NBjQyu0h9+AZZE=
