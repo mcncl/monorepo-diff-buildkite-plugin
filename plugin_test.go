@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -141,8 +142,8 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 				},
 				{
 					"default": {
-                        "command": "buildkite-agent pipeline upload other_tests.yml"
-                    }
+						"command": "buildkite-agent pipeline upload other_tests.yml"
+					}
 				}
 			]
 		}
@@ -256,12 +257,19 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 				Paths: []string{},
 				Step: Step{
 					Command: "buildkite-agent pipeline upload other_tests.yml",
+					Env: map[string]string{
+						"env1": "env-1",
+						"env2": "env-2",
+						"env3": "env-3",
+					},
 				},
 			},
 		},
 	}
 
-	assert.Equal(t, expected, got)
+	if diff := cmp.Diff(expected, got); diff != "" {
+		t.Fatalf("plugin diff (-want +got): \n%s", diff)
+	}
 }
 
 func TestPluginShouldOnlyFullyUnmarshallItselfAndNotOtherPlugins(t *testing.T) {
