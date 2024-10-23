@@ -7,6 +7,15 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+func defaultPlugin() Plugin {
+	return Plugin{
+		Diff:          "git diff --name-only HEAD~1",
+		Wait:          false,
+		LogLevel:      "info",
+		Interpolation: true,
+	}
+}
+
 func TestPluginWithEmptyParameter(t *testing.T) {
 	_, err := initializePlugin("[]")
 
@@ -26,14 +35,7 @@ func TestPluginShouldHaveDefaultValues(t *testing.T) {
 
 	got, _ := initializePlugin(param)
 
-	expected := Plugin{
-		Diff:          "git diff --name-only HEAD~1",
-		Wait:          false,
-		LogLevel:      "info",
-		Interpolation: true,
-	}
-
-	assert.Equal(t, expected, got)
+	assert.Equal(t, defaultPlugin(), got)
 }
 
 func TestPluginWithValidParameter(t *testing.T) {
@@ -330,6 +332,42 @@ func TestPluginShouldErrorIfPluginConfigIsInvalid(t *testing.T) {
 		}
 	]
 	`
+	_, err := initializePlugin(param)
+	assert.Error(t, err)
+}
+
+func TestPluginFullDifferentOrg(t *testing.T) {
+	param := `[{
+		"github.com/random-org/monorepo-diff-buildkite-plugin#commit": {}
+	}]`
+
+	got, _ := initializePlugin(param)
+	assert.Equal(t, defaultPlugin(), got)
+}
+
+func TestPluginRawReference(t *testing.T) {
+	param := `[{
+		"monorepo-diff#v1.2": {}
+	}]`
+
+	got, _ := initializePlugin(param)
+	assert.Equal(t, defaultPlugin(), got)
+}
+
+func TestPluginOrgRawReference(t *testing.T) {
+	param := `[{
+		"random-org/monorepo-diff-buildkite-plugin#commit": {}
+	}]`
+
+	got, _ := initializePlugin(param)
+	assert.Equal(t, defaultPlugin(), got)
+}
+
+func TestPluginInvalidReference(t *testing.T) {
+	param := `[{
+		":invalid/monorepo-diff#v1.2": {}
+	}]`
+
 	_, err := initializePlugin(param)
 	assert.Error(t, err)
 }

@@ -22,7 +22,7 @@ steps:
           image: "golang"
           always-pull: true
           workdir: /plugin
-  
+
   - label: ":linux: Build"
     command: make local
     artifact_paths: monorepo-diff-buildkite-plugin
@@ -31,15 +31,15 @@ steps:
           image: "golang"
           always-pull: true
           workdir: /plugin
-  
-  - wait:
+
+  - wait: ~
 
   - label: ":bomb: Triggers"
     plugins:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/one-match-one-miss"
           log_level: "debug"
           watch:
@@ -61,7 +61,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/multiple-paths"
           watch:
             - path:
@@ -74,7 +74,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/multiple-paths"
           watch:
             - path:
@@ -89,7 +89,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/multiple-paths"
           watch:
             - path: "user-service/"
@@ -112,7 +112,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/multiple-paths"
           watch:
             - path:
@@ -127,7 +127,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/commands-or-triggers"
           watch:
             - path: "user-service/"
@@ -161,7 +161,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/commands-or-triggers"
           watch:
             - path: "not_a_path/"
@@ -175,7 +175,7 @@ steps:
       - artifacts#v1.9.2:
           download:
             - "monorepo-diff-buildkite-plugin"
-      - monorepo-diff#${BUILDKITE_COMMIT}:
+      - ${BUILDKITE_PULL_REQUEST_REPO:-$BUILDKITE_REPO}#${BUILDKITE_COMMIT}:
           diff: "cat ./e2e/commands-or-triggers"
           watch:
             - path: "not_a_path/"
