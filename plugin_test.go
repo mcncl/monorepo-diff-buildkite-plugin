@@ -3,6 +3,7 @@ package main
 import (
 	"testing"
 
+	"github.com/google/go-cmp/cmp"
 	"github.com/stretchr/testify/assert"
 )
 
@@ -261,7 +262,9 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, expected, got)
+	if diff := cmp.Diff(expected, got); diff != "" {
+		t.Fatalf("plugin diff (-want +got): \n%s", diff)
+	}
 }
 
 func TestPluginShouldOnlyFullyUnmarshallItselfAndNotOtherPlugins(t *testing.T) {
