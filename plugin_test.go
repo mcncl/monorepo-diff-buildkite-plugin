@@ -16,6 +16,29 @@ func defaultPlugin() Plugin {
 	}
 }
 
+func defaultPluginWithDefault() Plugin {
+	ret := defaultPlugin()
+	ret.Watch = []WatchConfig{
+		{
+			Paths: []string{".buildkite/**/*"},
+			Step: Step{
+				Command: "echo hello world",
+				Label: "Example label",
+			},
+		},
+		{
+			Default: true,
+			Paths: []string{},
+			Step: Step{
+				Command: "echo default hello world",
+				Label: "Default label",
+			},
+		},
+	}
+
+	return ret
+}
+
 func TestPluginWithEmptyParameter(t *testing.T) {
 	_, err := initializePlugin("[]")
 
@@ -370,4 +393,66 @@ func TestPluginInvalidReference(t *testing.T) {
 
 	_, err := initializePlugin(param)
 	assert.Error(t, err)
+}
+
+func TestPluginDefaultCommand(t *testing.T) {
+	param := `[
+		{
+			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
+				"watch": [
+					{
+						"path": [
+							".buildkite/**/*"
+						],
+						"config": {
+							"label": "Example label",
+							"command": "echo hello world"
+						}
+					}, {
+						"default": {
+							"label": "Default label",
+							"command": "echo default hello world"
+						}
+					}
+				]
+			}
+		}
+	]
+	`
+
+	got, err := initializePlugin(param)
+	assert.NoError(t, err)
+	assert.Equal(t, defaultPluginWithDefault(), got)
+}
+
+func TestPluginDefaultConfigCommand(t *testing.T) {
+	param := `[
+		{
+			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
+				"watch": [
+					{
+						"path": [
+							".buildkite/**/*"
+						],
+						"config": {
+							"label": "Example label",
+							"command": "echo hello world"
+						}
+					}, {
+						"default": {
+							"config": {
+								"label": "Default label",
+								"command": "echo default hello world"
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+	`
+
+	got, err := initializePlugin(param)
+	assert.NoError(t, err)
+	assert.Equal(t, defaultPluginWithDefault(), got)
 }
