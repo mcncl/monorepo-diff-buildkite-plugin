@@ -23,15 +23,15 @@ func defaultPluginWithDefault() Plugin {
 			Paths: []string{".buildkite/**/*"},
 			Step: Step{
 				Command: "echo hello world",
-				Label: "Example label",
+				Label:   "Example label",
 			},
 		},
 		{
 			Default: true,
-			Paths: []string{},
+			Paths:   []string{},
 			Step: Step{
 				Command: "echo default hello world",
-				Label: "Default label",
+				Label:   "Default label",
 			},
 		},
 	}
