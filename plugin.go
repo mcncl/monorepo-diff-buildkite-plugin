@@ -126,8 +126,6 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 
 	setPluginNotify(&plugin.Notify, &plugin.RawNotify)
 
-	// Path and SkipPath can be string or an array of strings,
-	// handle both cases and create an array of paths on both.
 	for i, p := range plugin.Watch {
 		if p.Default != nil {
 			plugin.Watch[i].Paths = []string{}
@@ -145,6 +143,8 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 				}
 			}
 		} else if p.RawPath != nil {
+			// Path and SkipPath can be string or an array of strings,
+			// handle both cases and create an array of paths on both.
 			switch p.RawPath.(type) {
 			case string:
 				plugin.Watch[i].Paths = []string{plugin.Watch[i].RawPath.(string)}
