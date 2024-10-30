@@ -142,6 +142,7 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 					return err
 				}
 			}
+			plugin.Watch[i].Default = true
 		} else if p.RawPath != nil {
 			// Path and SkipPath can be string or an array of strings,
 			// handle both cases and create an array of paths on both.
