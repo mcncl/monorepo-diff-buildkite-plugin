@@ -162,7 +162,7 @@ to avoid trying to interpolate the commit message, which can cause failures.
 
 #### `default` (optional)
 
-A default `config` to run if no paths are matched, the `config` key is not reuired, so a `default` can be written with a `config` attribute or simple just a `command` or `trigger`.
+A default `config` to run if no paths are matched, the `config` key is not required, so a `default` can be written with a `config` attribute or simple just a `command` or `trigger`.
 
 **Example**
 
