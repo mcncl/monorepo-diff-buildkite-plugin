@@ -16,6 +16,29 @@ func defaultPlugin() Plugin {
 	}
 }
 
+func defaultPluginWithDefault() Plugin {
+	ret := defaultPlugin()
+	ret.Watch = []WatchConfig{
+		{
+			Paths: []string{".buildkite/**/*"},
+			Step: Step{
+				Command: "echo hello world",
+				Label:   "Example label",
+			},
+		},
+		{
+			Default: true,
+			Paths:   []string{},
+			Step: Step{
+				Command: "echo default hello world",
+				Label:   "Default label",
+			},
+		},
+	}
+
+	return ret
+}
+
 func TestPluginWithEmptyParameter(t *testing.T) {
 	_, err := initializePlugin("[]")
 
@@ -38,7 +61,7 @@ func TestPluginShouldHaveDefaultValues(t *testing.T) {
 	assert.Equal(t, defaultPlugin(), got)
 }
 
-func TestPluginWithValidParameter(t *testing.T) {
+func TestPluginWithEmptyStringParameter(t *testing.T) {
 	param := ""
 	got, err := initializePlugin(param)
 	expected := Plugin{}
@@ -136,15 +159,7 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 					"config": {
 						"group": "my group",
 						"command": "echo hello-group",
-						"env": [
-							"env4", "hi= bye"
-						],
 						"soft_fail": true
-					}
-				},
-				{
-					"default": {
-						"command": "buildkite-agent pipeline upload other_tests.yml"
 					}
 				}
 			]
@@ -246,24 +261,8 @@ func TestPluginShouldUnmarshallCorrectly(t *testing.T) {
 						"env1": "env-1",
 						"env2": "env-2",
 						"env3": "env-3",
-						"env4": "env-4",
-						"hi":   "bye",
 					},
 					SoftFail: true,
-				},
-			},
-			{
-				Default: map[string]interface{}{
-					"command": "buildkite-agent pipeline upload other_tests.yml",
-				},
-				Paths: []string{},
-				Step: Step{
-					Command: "buildkite-agent pipeline upload other_tests.yml",
-					Env: map[string]string{
-						"env1": "env-1",
-						"env2": "env-2",
-						"env3": "env-3",
-					},
 				},
 			},
 		},
@@ -287,27 +286,13 @@ func TestPluginShouldOnlyFullyUnmarshallItselfAndNotOtherPlugins(t *testing.T) {
 			}
 		},
 		{
-			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
-				"watch": [
-					{
-						"env": [
-							"EXAMPLE_TOKEN"
-						],
-						"path": [
-							".buildkite/**/*"
-						],
-						"config": {
-							"label": "Example label",
-							"command": "echo hello world\\n"
-						}
-					}
-				]
-			}
+			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": { }
 		}
 	]
 	`
-	_, err := initializePlugin(param)
-	assert.NoError(t, err)
+	got, _ := initializePlugin(param)
+	assert.Equal(t, defaultPlugin(), got)
+
 }
 
 func TestPluginShouldErrorIfPluginConfigIsInvalid(t *testing.T) {
@@ -370,4 +355,66 @@ func TestPluginInvalidReference(t *testing.T) {
 
 	_, err := initializePlugin(param)
 	assert.Error(t, err)
+}
+
+func TestPluginDefaultCommand(t *testing.T) {
+	param := `[
+		{
+			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
+				"watch": [
+					{
+						"path": [
+							".buildkite/**/*"
+						],
+						"config": {
+							"label": "Example label",
+							"command": "echo hello world"
+						}
+					}, {
+						"default": {
+							"label": "Default label",
+							"command": "echo default hello world"
+						}
+					}
+				]
+			}
+		}
+	]
+	`
+
+	got, err := initializePlugin(param)
+	assert.NoError(t, err)
+	assert.Equal(t, defaultPluginWithDefault(), got)
+}
+
+func TestPluginDefaultConfigCommand(t *testing.T) {
+	param := `[
+		{
+			"github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
+				"watch": [
+					{
+						"path": [
+							".buildkite/**/*"
+						],
+						"config": {
+							"label": "Example label",
+							"command": "echo hello world"
+						}
+					}, {
+						"default": {
+							"config": {
+								"label": "Default label",
+								"command": "echo default hello world"
+							}
+						}
+					}
+				]
+			}
+		}
+	]
+	`
+
+	got, err := initializePlugin(param)
+	assert.NoError(t, err)
+	assert.Equal(t, defaultPluginWithDefault(), got)
 }

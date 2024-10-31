@@ -126,20 +126,26 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 
 	setPluginNotify(&plugin.Notify, &plugin.RawNotify)
 
-	// Path and SkipPath can be string or an array of strings,
-	// handle both cases and create an array of paths on both.
 	for i, p := range plugin.Watch {
 		if p.Default != nil {
 			plugin.Watch[i].Paths = []string{}
 			if config, ok := p.Default.(map[string]interface{}); ok && len(config) > 0 {
 				// Use the default config directly
-				b, _ := json.Marshal(config)
+				conf := config
+				if _, ok := config["config"]; ok {
+					// or allow for it to be in a config configuration
+					conf = config["config"].(map[string]interface{})
+				}
+				b, _ := json.Marshal(conf)
 				err := json.Unmarshal(b, &plugin.Watch[i].Step)
 				if err != nil {
 					return err
 				}
 			}
+			plugin.Watch[i].Default = true
 		} else if p.RawPath != nil {
+			// Path and SkipPath can be string or an array of strings,
+			// handle both cases and create an array of paths on both.
 			switch p.RawPath.(type) {
 			case string:
 				plugin.Watch[i].Paths = []string{plugin.Watch[i].RawPath.(string)}
@@ -367,11 +373,11 @@ func parseEnv(raw interface{}) (map[string]string, error) {
 
 func getPluginName(s string) string {
 	ref := s
-	if strings.HasPrefix(ref, "github.com/") && ! strings.Contains(ref, "://") {
+	if strings.HasPrefix(ref, "github.com/") && !strings.Contains(ref, "://") {
 		ref = "https://" + ref
 	}
 
-	u, err := url.Parse(ref);
+	u, err := url.Parse(ref)
 	// if URL could not be parsed, assume it is a direct reference
 	if err != nil {
 		return s
