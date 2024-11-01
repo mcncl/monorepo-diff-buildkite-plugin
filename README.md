@@ -1,4 +1,4 @@
-# Monorepo-diff-buildkite-plugin
+# Monorepo-diff-buildkite-plugin [![Build status](https://badge.buildkite.com/9e787df12fec365265a5284e0ae1c87c816aca648d8fd8f468.svg)](https://buildkite.com/buildkite/monorail-plugin-monorepo)
 
 This Monorepo plugin will assist you in triggering pipelines, as well as run commands in your CI by watching folders in your `monorepo`.
 
