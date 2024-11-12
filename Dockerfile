@@ -5,7 +5,7 @@ WORKDIR /plugin
 
 COPY . .
 
-RUN goreleaser build --rm-dist --skip-validate --config .goreleaser-test.yml
+RUN goreleaser build --clean --skip=validate --config .goreleaser-test.yml
 
 # Stage 2: Lint the plugin using Buildkite plugin-linter
 FROM buildkite/plugin-linter:latest as linter
