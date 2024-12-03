@@ -13,7 +13,7 @@ test-go:
 .PHONY: build-docker-test
 build-docker-test:
 ifneq (${HAS_DOCKER},)
-	docker build -t ${NAME} .
+	docker build -t ${NAME} -f tests/Dockerfile .
 endif
 
 .PHONY: test-docker
