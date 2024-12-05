@@ -16,7 +16,7 @@ To get started with development:
 - Make your changes (see [Formatting](https://github.com/buildkite-plugins/monorepo-diff-buildkite-plugin/blob/master/CONTRIBUTING.md#formatting)) and commit to your fork. Use [Conventional Commits](https://www.conventionalcommits.org/) style for commit messages.
 - Add relevant unit tests (see [Testing](https://github.com/buildkite-plugins/monorepo-diff-buildkite-plugin/blob/master/CONTRIBUTING.md#testing)) for your changes.
 - Update documentation if necessary.
-- Open a pull request; We have the block step that a maintainer will need to unblock to run the tests.
+- Open a pull request, a maintainer will assist in reviewing the pull request
 - After review and approval, a maintainer will merge your pull request and create a release (see [Releasing](https://github.com/buildkite-plugins/monorepo-diff-buildkite-plugin/blob/master/CONTRIBUTING.md#releasing)).
 
 ## Testing
