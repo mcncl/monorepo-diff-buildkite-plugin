@@ -93,16 +93,36 @@ type Agent map[string]string
 
 // Build is buildkite build definition
 type Build struct {
-	Message  string                 `yaml:"message,omitempty"`
-	Branch   string                 `yaml:"branch,omitempty"`
-	Commit   string                 `yaml:"commit,omitempty"`
+	Message  string                 `yaml:"message,omitempty" json:"message,omitempty"`
+	Branch   string                 `yaml:"branch,omitempty" json:"branch,omitempty"`
+	Commit   string                 `yaml:"commit,omitempty" json:"commit,omitempty"`
 	RawEnv   interface{}            `json:"env" yaml:",omitempty"`
 	Env      map[string]string      `yaml:"env,omitempty"`
 	MetaData map[string]interface{} `yaml:"meta_data,omitempty" json:"meta_data,omitempty"`
-	// Notify  []Notify          `yaml:"notify,omitempty"`
 }
 
-// UnmarshalJSON set defaults properties
+func (b *Build) UnmarshalJSON(data []byte) error {
+	// Create a temporary struct with same fields
+	type BuildAlias Build
+	aux := &struct {
+		*BuildAlias
+		MetaData map[string]interface{} `json:"meta_data,omitempty"`
+	}{
+		BuildAlias: (*BuildAlias)(b),
+	}
+
+	if err := json.Unmarshal(data, &aux); err != nil {
+		return err
+	}
+
+	// Explicitly set metadata if it exists
+	if aux.MetaData != nil {
+		b.MetaData = aux.MetaData
+	}
+
+	return nil
+}
+
 func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 	type plain Plugin
 
@@ -113,7 +133,9 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 		Interpolation: true,
 	}
 
-	_ = json.Unmarshal(data, def)
+	if err := json.Unmarshal(data, def); err != nil {
+		return err
+	}
 
 	*plugin = Plugin(*def)
 
@@ -131,22 +153,22 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 		if p.Default != nil {
 			plugin.Watch[i].Paths = []string{}
 			if config, ok := p.Default.(map[string]interface{}); ok && len(config) > 0 {
-				// Use the default config directly
 				conf := config
 				if _, ok := config["config"]; ok {
-					// or allow for it to be in a config configuration
 					conf = config["config"].(map[string]interface{})
 				}
+
+				// Convert config to JSON
 				b, _ := json.Marshal(conf)
-				err := json.Unmarshal(b, &plugin.Watch[i].Step)
-				if err != nil {
+
+				// Unmarshal into Step, which will use our custom Build UnmarshalJSON
+				if err := json.Unmarshal(b, &plugin.Watch[i].Step); err != nil {
 					return err
 				}
 			}
 			plugin.Watch[i].Default = true
 		} else if p.RawPath != nil {
-			// Path and SkipPath can be string or an array of strings,
-			// handle both cases and create an array of paths on both.
+			// Handle path configuration
 			switch p.RawPath.(type) {
 			case string:
 				plugin.Watch[i].Paths = []string{plugin.Watch[i].RawPath.(string)}
@@ -155,12 +177,9 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 					plugin.Watch[i].Paths = append(plugin.Watch[i].Paths, v.(string))
 				}
 			}
-
-			if _, ok := p.Step.Build.MetaData["meta_data"]; ok {
-				log.Debug("Found metadata in build config:", p.Step.Build.MetaData)
-			}
 		}
 
+		// Handle skip paths
 		switch p.RawSkipPath.(type) {
 		case string:
 			plugin.Watch[i].SkipPaths = []string{plugin.Watch[i].RawSkipPath.(string)}
@@ -170,7 +189,9 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 			}
 		}
 
+		// Only set defaults if there's a trigger
 		if plugin.Watch[i].Step.Trigger != "" {
+			// Use our updated setBuild that preserves metadata
 			setBuild(&plugin.Watch[i].Step.Build)
 		}
 
@@ -182,8 +203,6 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 
 		p.RawPath = nil
 		p.RawSkipPath = nil
-
-		log.Debug("Final step configuration:", plugin.Watch[i].Step)
 	}
 
 	return nil
@@ -304,10 +323,7 @@ func escapeInterpolation(s string) string {
 }
 
 func setBuild(build *Build) {
-	// Add debug logging
-	log.Debug("Initial build state:", build)
-	existingMetadata := build.MetaData
-	log.Debug("Saved metadata:", existingMetadata)
+	metadata := build.MetaData
 
 	if build.Message == "" {
 		build.Message = escapeInterpolation(env("BUILDKITE_MESSAGE", ""))
@@ -321,12 +337,9 @@ func setBuild(build *Build) {
 		build.Commit = escapeInterpolation(env("BUILDKITE_COMMIT", ""))
 	}
 
-	if existingMetadata != nil {
-		build.MetaData = existingMetadata
-		log.Debug("Restored metadata:", build.MetaData)
+	if metadata != nil {
+		build.MetaData = metadata
 	}
-
-	log.Debug("Final build state:", build)
 }
 
 // appends top level env to Step.Env and Step.Build.Env
