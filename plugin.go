@@ -314,7 +314,7 @@ func setBuild(build *Build) {
 		build.Commit = escapeInterpolation(env("BUILDKITE_COMMIT", ""))
 	}
 
-	if build.MetaData != nil {
+	if existingMetadata != nil {
 		build.MetaData = existingMetadata
 	}
 }
