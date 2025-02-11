@@ -155,6 +155,10 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 					plugin.Watch[i].Paths = append(plugin.Watch[i].Paths, v.(string))
 				}
 			}
+
+			if _, ok := p.Step.Build.MetaData["meta_data"]; ok {
+				log.Debug("Found metadata in build config:", p.Step.Build.MetaData)
+			}
 		}
 
 		switch p.RawSkipPath.(type) {
@@ -178,6 +182,8 @@ func (plugin *Plugin) UnmarshalJSON(data []byte) error {
 
 		p.RawPath = nil
 		p.RawSkipPath = nil
+
+		log.Debug("Final step configuration:", plugin.Watch[i].Step)
 	}
 
 	return nil
@@ -298,9 +304,10 @@ func escapeInterpolation(s string) string {
 }
 
 func setBuild(build *Build) {
-	// when defaulting to existing literal values make sure those values
-	// don't trigger interpolation with any stray dollar characters.
+	// Add debug logging
+	log.Debug("Initial build state:", build)
 	existingMetadata := build.MetaData
+	log.Debug("Saved metadata:", existingMetadata)
 
 	if build.Message == "" {
 		build.Message = escapeInterpolation(env("BUILDKITE_MESSAGE", ""))
@@ -316,7 +323,10 @@ func setBuild(build *Build) {
 
 	if existingMetadata != nil {
 		build.MetaData = existingMetadata
+		log.Debug("Restored metadata:", build.MetaData)
 	}
+
+	log.Debug("Final build state:", build)
 }
 
 // appends top level env to Step.Env and Step.Build.Env
