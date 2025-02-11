@@ -516,3 +516,41 @@ func TestGeneratePipelineWithNoStepsAndNoHooks(t *testing.T) {
 
 	assert.Equal(t, want, string(got))
 }
+
+func TestGeneratePipelinePreservesMetadata(t *testing.T) {
+	steps := []Step{
+		{
+			Trigger: "foo-service-pipeline",
+			Build: Build{
+				Message: "build message",
+				MetaData: map[string]interface{}{
+					"baz": "foo",
+					"foo": "bar",
+				},
+			},
+		},
+	}
+
+	plugin := Plugin{
+		Wait: true,
+	}
+
+	pipeline, _, err := generatePipeline(steps, plugin)
+	require.NoError(t, err)
+	defer os.Remove(pipeline.Name())
+
+	got, err := os.ReadFile(pipeline.Name())
+	require.NoError(t, err)
+
+	want := `steps:
+- trigger: foo-service-pipeline
+  build:
+    message: build message
+    meta_data:
+      baz: foo
+      foo: bar
+- wait: null
+`
+
+	assert.Equal(t, want, string(got))
+}

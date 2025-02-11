@@ -300,6 +300,7 @@ func escapeInterpolation(s string) string {
 func setBuild(build *Build) {
 	// when defaulting to existing literal values make sure those values
 	// don't trigger interpolation with any stray dollar characters.
+	existingMetadata := build.MetaData
 
 	if build.Message == "" {
 		build.Message = escapeInterpolation(env("BUILDKITE_MESSAGE", ""))
@@ -311,6 +312,10 @@ func setBuild(build *Build) {
 
 	if build.Commit == "" {
 		build.Commit = escapeInterpolation(env("BUILDKITE_COMMIT", ""))
+	}
+
+	if build.MetaData != nil {
+		build.MetaData = existingMetadata
 	}
 }
 
