@@ -77,6 +77,9 @@ configuration:
                   type: string
                 env:
                   type: array
+                meta_data:
+                  type: object
+                  additionalProperties: true
             agents:
               type: object
               properties:
@@ -97,5 +100,4 @@ configuration:
           type: string
   required:
     - watch
-
 # yaml-language-server: $schema=https://raw.githubusercontent.com/buildkite-plugins/buildkite-plugin-linter/master/lib/plugin-yaml-schema.yml

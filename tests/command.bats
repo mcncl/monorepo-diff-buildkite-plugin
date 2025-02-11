@@ -336,4 +336,43 @@ EOM
   assert_output --partial << EOM
 steps: []
 EOM
-} 
+}
+
+@test "Pipeline is generated with build metadata" {
+  export BUILDKITE_PLUGINS='[{
+    "github.com/buildkite-plugins/monorepo-diff-buildkite-plugin": {
+      "diff":"echo foo-service/",
+      "watch": [
+        {
+          "path":"foo-service/",
+          "config": {
+            "trigger":"foo-service",
+            "build": {
+              "message": "deployment message",
+              "meta_data": {
+                "release-version": "1.1",
+                "deploy-env": "staging"
+              }
+            }
+          }
+        }
+      ]
+    }
+  }]'
+
+  run $PWD/hooks/command
+
+  assert_success
+
+  assert_output --partial << EOM
+steps:
+- trigger: foo-service
+  build:
+    message: deployment message
+    branch: go-rewrite
+    commit: 123
+    meta_data:
+      release-version: "1.1"
+      deploy-env: staging
+EOM
+}

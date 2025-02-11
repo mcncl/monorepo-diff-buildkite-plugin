@@ -298,7 +298,8 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 					Paths:     []string{"watch-path"},
 					SkipPaths: []string{"watch-path/text.txt"},
 					Step:      Step{Trigger: "service-2"},
-				}},
+				},
+			},
 			Expected: []Step{
 				{Trigger: "service-1"},
 			},
@@ -316,7 +317,8 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 					Paths:     []string{"*.txt"},
 					SkipPaths: []string{"*.secret.txt"},
 					Step:      Step{Trigger: "service-2"},
-				}},
+				},
+			},
 			Expected: []Step{
 				{Trigger: "service-1"},
 			},
@@ -334,7 +336,8 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 					Paths:     []string{"**/*.txt"},
 					SkipPaths: []string{"docs/*.txt"},
 					Step:      Step{Trigger: "service-2"},
-				}},
+				},
+			},
 			Expected: []Step{
 				{Trigger: "service-1"},
 			},
@@ -353,7 +356,8 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 					Paths:     []string{"**/*.txt"},
 					SkipPaths: []string{"docs/*.secret.txt"},
 					Step:      Step{Trigger: "service-2"},
-				}},
+				},
+			},
 			Expected: []Step{
 				{Trigger: "service-1"},
 				{Trigger: "service-2"},
@@ -367,7 +371,8 @@ func TestPipelinesStepsToTrigger(t *testing.T) {
 				{
 					SkipPaths: []string{"docs/*.secret.txt"},
 					Step:      Step{Trigger: "service-1"},
-				}},
+				},
+			},
 			Expected: []Step{},
 		},
 	}

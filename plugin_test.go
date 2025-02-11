@@ -292,7 +292,6 @@ func TestPluginShouldOnlyFullyUnmarshallItselfAndNotOtherPlugins(t *testing.T) {
 	`
 	got, _ := initializePlugin(param)
 	assert.Equal(t, defaultPlugin(), got)
-
 }
 
 func TestPluginShouldErrorIfPluginConfigIsInvalid(t *testing.T) {
@@ -417,4 +416,58 @@ func TestPluginDefaultConfigCommand(t *testing.T) {
 	got, err := initializePlugin(param)
 	assert.NoError(t, err)
 	assert.Equal(t, defaultPluginWithDefault(), got)
+}
+
+func TestPluginWithBuildMetadata(t *testing.T) {
+	param := `[{
+        "github.com/buildkite-plugins/monorepo-diff-buildkite-plugin#commit": {
+            "diff": "echo foo-service/",
+            "watch": [
+                {
+                    "path": "foo-service/",
+                    "config": {
+                        "trigger": "foo-service",
+                        "build": {
+                            "message": "some message",
+                            "meta_data": {
+                                "release-version": "1.1",
+                                "environment": "staging"
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }]`
+
+	got, err := initializePlugin(param)
+	assert.NoError(t, err)
+
+	expected := Plugin{
+		Diff:          "echo foo-service/",
+		Wait:          false,
+		LogLevel:      "info",
+		Interpolation: true,
+		Watch: []WatchConfig{
+			{
+				Paths: []string{"foo-service/"},
+				Step: Step{
+					Trigger: "foo-service",
+					Build: Build{
+						Message: "some message",
+						Branch:  "go-rewrite",
+						Commit:  "123",
+						MetaData: map[string]interface{}{
+							"release-version": "1.1",
+							"environment":     "staging",
+						},
+					},
+				},
+			},
+		},
+	}
+
+	if diff := cmp.Diff(expected, got); diff != "" {
+		t.Fatalf("plugin diff (-want +got): \n%s", diff)
+	}
 }
